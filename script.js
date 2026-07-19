@@ -12,7 +12,7 @@ form.addEventListener("submit", function (event) {
     const amount = Number(document.getElementById("amount").value);
     const dueDateValue = document.getElementById("dueDate").value;
     const tone = document.getElementById("tone").value;
-
+    const paymentLink = document.getElementById("paymentLink").value.trim();
     const dueDate = new Date(`${dueDateValue}T00:00:00`);
 
     const formattedDueDate = dueDate.toLocaleDateString("en-US", {
@@ -45,7 +45,9 @@ Please arrange payment promptly or contact us by email if there is an issue with
 
 Please submit payment immediately to prevent further collection action. If payment has already been made, please send confirmation.`;
     }
-
+    if (paymentLink) {
+        message += `\n\nPay securely here: ${paymentLink}`;
+    }
     const reminder = `Subject: ${subject}
 
 Hello ${customerName},
