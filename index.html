@@ -17,7 +17,13 @@
 
             <label for="customerName">Customer name</label>
             <input type="text" id="customerName" required>
-
+            <label for="customerEmail">Customer email</label>
+            <input
+                type="email"
+                id="customerEmail"
+                placeholder="customer@example.com"
+                required
+            >
             <label for="invoiceNumber">Invoice number</label>
             <input type="text" id="invoiceNumber" required>
 
@@ -45,6 +51,7 @@
             <h2>Your payment reminder</h2>
             <div id="reminderOutput"></div>
             <button type="button" id="copyButton">Copy Message</button>
+            <button type="button" id="emailButton">Send with Email App</button>
         </section>
         <section class="feedback-section">
             <p>Help us improve Invoice Follow-Up AI.</p>
