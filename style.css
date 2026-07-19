@@ -102,4 +102,29 @@ button:hover {
 select:focus {
     border-color: #2563eb;
     outline: 3px solid rgba(37, 99, 235, 0.15);
+}.feedback-section {
+    margin-top: 30px;
+    padding-top: 24px;
+    border-top: 1px solid #d1d5db;
+    text-align: center;
+}
+
+.feedback-section p {
+    margin-bottom: 18px;
+    color: #4b5563;
+}
+
+.feedback-button {
+    display: inline-block;
+    padding: 12px 20px;
+    border: 2px solid #2563eb;
+    border-radius: 8px;
+    color: #2563eb;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.feedback-button:hover {
+    background: #2563eb;
+    color: white;
 }
