@@ -45,54 +45,91 @@ form.addEventListener("submit", function (event) {
 
     const dueDate = new Date(`${dueDateValue}T00:00:00`);
 
-    const formattedDueDate = dueDate.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric"
-    });
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    const formattedAmount = amount.toLocaleString("en-US", {
-        style: "currency",
-        currency: "USD"
-    });
+    const millisecondsPerDay = 1000 * 60 * 60 * 24;
+
+    const daysOverdue = Math.floor(
+        (today - dueDate) / millisecondsPerDay
+    );
+
+    if (daysOverdue < 0) {
+        alert(
+            "The due date is in the future. Please select today or a past date."
+        );
+        return;
+    }
+
+    const overdueStatus =
+        daysOverdue === 0
+            ? "Due today"
+            : `${daysOverdue} ${
+                  daysOverdue === 1 ? "day" : "days"
+              } overdue`;
+
+    const formattedDueDate = dueDate.toLocaleDateString(
+        "en-US",
+        {
+            year: "numeric",
+            month: "long",
+            day: "numeric"
+        }
+    );
+
+    const formattedAmount = amount.toLocaleString(
+        "en-US",
+        {
+            style: "currency",
+            currency: "USD"
+        }
+    );
 
     let subject = "";
     let message = "";
 
     if (tone === "friendly") {
-        subject = `Friendly Reminder for Invoice ${invoiceNumber}`;
+        subject =
+            `Friendly Reminder for Invoice ${invoiceNumber}`;
 
-        message = `This is a friendly reminder that invoice ${invoiceNumber} for ${formattedAmount} was due on ${formattedDueDate}.
-
-Please send payment at your earliest convenience. If you have already paid this invoice, please disregard this message.`;
+        message = [
+            `This is a friendly reminder that invoice ${invoiceNumber} for ${formattedAmount} was due on ${formattedDueDate}.`,
+            "Please send payment at your earliest convenience. If you have already paid this invoice, please disregard this message."
+        ].join("\n\n");
     } else if (tone === "firm") {
-        subject = `Payment Required for Overdue Invoice ${invoiceNumber}`;
+        subject =
+            `Payment Required for Overdue Invoice ${invoiceNumber}`;
 
-        message = `Our records show that invoice ${invoiceNumber} for ${formattedAmount}, due on ${formattedDueDate}, remains unpaid.
-
-Please arrange payment promptly or contact us by email if there is an issue with this invoice.`;
+        message = [
+            `Our records show that invoice ${invoiceNumber} for ${formattedAmount}, due on ${formattedDueDate}, remains unpaid.`,
+            "Please arrange payment promptly or contact us by email if there is an issue with this invoice."
+        ].join("\n\n");
     } else {
-        subject = `Final Notice for Invoice ${invoiceNumber}`;
+        subject =
+            `Final Notice for Invoice ${invoiceNumber}`;
 
-        message = `This is a final notice regarding invoice ${invoiceNumber} for ${formattedAmount}, which was due on ${formattedDueDate}.
-
-Please submit payment immediately to prevent further collection action. If payment has already been made, please send confirmation.`;
+        message = [
+            `This is a final notice regarding invoice ${invoiceNumber} for ${formattedAmount}, which was due on ${formattedDueDate}.`,
+            "Please submit payment immediately to prevent further collection action. If payment has already been made, please send confirmation."
+        ].join("\n\n");
     }
 
     if (paymentLink) {
-        message += `\n\nPay securely here: ${paymentLink}`;
+        message +=
+            `\n\nPay securely here: ${paymentLink}`;
     }
 
-    const body = `Hello ${customerName},
+    const body = [
+        `Hello ${customerName},`,
+        `Invoice status: ${overdueStatus}`,
+        message,
+        `Thank you,\n${businessName}`
+    ].join("\n\n");
 
-${message}
-
-Thank you,
-${businessName}`;
-
-    const reminder = `Subject: ${subject}
-
-${body}`;
+    const reminder = [
+        `Subject: ${subject}`,
+        body
+    ].join("\n\n");
 
     emailRecipient = customerEmail;
     emailSubject = subject;
@@ -100,37 +137,52 @@ ${body}`;
 
     reminderOutput.textContent = reminder;
     resultSection.hidden = false;
+
     resultSection.scrollIntoView({
         behavior: "smooth"
     });
 });
 
-copyButton.addEventListener("click", async function () {
-    try {
-        await navigator.clipboard.writeText(
-            reminderOutput.textContent
-        );
+copyButton.addEventListener(
+    "click",
+    async function () {
+        try {
+            await navigator.clipboard.writeText(
+                reminderOutput.textContent
+            );
 
-        copyButton.textContent = "Copied!";
+            copyButton.textContent = "Copied!";
 
-        setTimeout(function () {
-            copyButton.textContent = "Copy Message";
-        }, 2000);
-    } catch {
-        copyButton.textContent = "Copy failed";
+            setTimeout(function () {
+                copyButton.textContent =
+                    "Copy Message";
+            }, 2000);
+        } catch {
+            copyButton.textContent =
+                "Copy failed";
+        }
     }
-});
+);
 
-emailButton.addEventListener("click", function () {
-    if (!emailRecipient || !emailSubject || !emailBody) {
-        alert("Please generate a reminder first.");
-        return;
+emailButton.addEventListener(
+    "click",
+    function () {
+        if (
+            !emailRecipient ||
+            !emailSubject ||
+            !emailBody
+        ) {
+            alert(
+                "Please generate a reminder first."
+            );
+            return;
+        }
+
+        const emailLink =
+            `mailto:${encodeURIComponent(emailRecipient)}` +
+            `?subject=${encodeURIComponent(emailSubject)}` +
+            `&body=${encodeURIComponent(emailBody)}`;
+
+        window.location.href = emailLink;
     }
-
-    const emailLink =
-        `mailto:${encodeURIComponent(emailRecipient)}` +
-        `?subject=${encodeURIComponent(emailSubject)}` +
-        `&body=${encodeURIComponent(emailBody)}`;
-
-    window.location.href = emailLink;
-});
+);
