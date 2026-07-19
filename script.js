@@ -3,10 +3,75 @@ const resultSection = document.getElementById("resultSection");
 const reminderOutput = document.getElementById("reminderOutput");
 const copyButton = document.getElementById("copyButton");
 const emailButton = document.getElementById("emailButton");
+const saveButton = document.getElementById("saveButton");
+const clearHistoryButton = document.getElementById(
+    "clearHistoryButton"
+);
+const emptyHistoryMessage = document.getElementById(
+    "emptyHistoryMessage"
+);
+const historyList = document.getElementById("historyList");
 
 let emailRecipient = "";
 let emailSubject = "";
 let emailBody = "";
+let currentReminder = null;
+
+function getSavedReminders() {
+    try {
+        const savedData = localStorage.getItem(
+            "invoiceReminderHistory"
+        );
+
+        return savedData ? JSON.parse(savedData) : [];
+    } catch {
+        return [];
+    }
+}
+
+function storeSavedReminders(reminders) {
+    localStorage.setItem(
+        "invoiceReminderHistory",
+        JSON.stringify(reminders)
+    );
+}
+
+function renderHistory() {
+    const reminders = getSavedReminders();
+
+    historyList.innerHTML = "";
+    emptyHistoryMessage.hidden = reminders.length > 0;
+    clearHistoryButton.hidden = reminders.length === 0;
+
+    reminders.forEach(function (reminder) {
+        const item = document.createElement("article");
+        item.className = "history-item";
+
+        const title = document.createElement("h3");
+        title.textContent =
+            `${reminder.invoiceNumber} — ` +
+            `${reminder.customerName}`;
+
+        const amount = document.createElement("p");
+        amount.textContent =
+            `Amount: ${reminder.formattedAmount}`;
+
+        const status = document.createElement("p");
+        status.textContent =
+            `Status: ${reminder.overdueStatus}`;
+
+        const savedDate = document.createElement("p");
+        savedDate.textContent =
+            `Saved: ${reminder.savedAt}`;
+
+        item.appendChild(title);
+        item.appendChild(amount);
+        item.appendChild(status);
+        item.appendChild(savedDate);
+
+        historyList.appendChild(item);
+    });
+}
 
 form.addEventListener("submit", function (event) {
     event.preventDefault();
@@ -126,7 +191,7 @@ form.addEventListener("submit", function (event) {
         `Thank you,\n${businessName}`
     ].join("\n\n");
 
-    const reminder = [
+    const reminderText = [
         `Subject: ${subject}`,
         body
     ].join("\n\n");
@@ -135,8 +200,18 @@ form.addEventListener("submit", function (event) {
     emailSubject = subject;
     emailBody = body;
 
-    reminderOutput.textContent = reminder;
+    currentReminder = {
+        invoiceNumber,
+        customerName,
+        formattedAmount,
+        overdueStatus,
+        reminderText,
+        savedAt: new Date().toLocaleString("en-US")
+    };
+
+    reminderOutput.textContent = reminderText;
     resultSection.hidden = false;
+    saveButton.textContent = "Save Reminder";
 
     resultSection.scrollIntoView({
         behavior: "smooth"
@@ -186,3 +261,47 @@ emailButton.addEventListener(
         window.location.href = emailLink;
     }
 );
+
+saveButton.addEventListener(
+    "click",
+    function () {
+        if (!currentReminder) {
+            alert(
+                "Please generate a reminder first."
+            );
+            return;
+        }
+
+        const reminders = getSavedReminders();
+
+        reminders.unshift(currentReminder);
+
+        storeSavedReminders(
+            reminders.slice(0, 25)
+        );
+
+        renderHistory();
+        saveButton.textContent = "Saved!";
+    }
+);
+
+clearHistoryButton.addEventListener(
+    "click",
+    function () {
+        const confirmed = window.confirm(
+            "Delete all saved reminders from this browser?"
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        localStorage.removeItem(
+            "invoiceReminderHistory"
+        );
+
+        renderHistory();
+    }
+);
+
+renderHistory();
