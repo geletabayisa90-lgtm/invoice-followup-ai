@@ -26,7 +26,12 @@
 
             <label for="dueDate">Due date</label>
             <input type="date" id="dueDate" required>
-
+            <label for="tone">Reminder tone</label>
+            <select id="tone" required>
+                <option value="friendly">Friendly reminder</option>
+                <option value="firm">Firm reminder</option>
+                <option value="final">Final notice</option>
+            </select>
             <button type="submit">Generate Reminder</button>
         </form>
 
