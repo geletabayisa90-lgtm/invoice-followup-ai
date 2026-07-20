@@ -4,15 +4,12 @@ const reminderOutput = document.getElementById("reminderOutput");
 const copyButton = document.getElementById("copyButton");
 const emailButton = document.getElementById("emailButton");
 const saveButton = document.getElementById("saveButton");
-
 const clearHistoryButton = document.getElementById(
     "clearHistoryButton"
 );
-
 const emptyHistoryMessage = document.getElementById(
     "emptyHistoryMessage"
 );
-
 const historyList = document.getElementById("historyList");
 
 let emailRecipient = "";
@@ -81,7 +78,7 @@ function renderHistory() {
     emptyHistoryMessage.hidden = reminders.length > 0;
     clearHistoryButton.hidden = reminders.length === 0;
 
-    reminders.forEach(function (reminder) {
+    reminders.forEach(function (reminder, index) {
         const item = document.createElement("article");
         item.className = "history-item";
 
@@ -102,10 +99,114 @@ function renderHistory() {
         savedDate.textContent =
             `Saved: ${reminder.savedAt}`;
 
+        const actions = document.createElement("div");
+        actions.className = "history-actions";
+
+        const openButton = document.createElement("button");
+        openButton.type = "button";
+        openButton.textContent = "Open";
+
+        openButton.addEventListener("click", function () {
+            if (!reminder.reminderText) {
+                alert(
+                    "This older saved reminder does not contain a message."
+                );
+                return;
+            }
+
+            currentReminder = reminder;
+            emailRecipient = reminder.customerEmail || "";
+
+            const firstLine =
+                reminder.reminderText.split("\n")[0];
+
+            emailSubject = firstLine
+                .replace(/^Subject:\s*/i, "")
+                .trim();
+
+            reminderOutput.value =
+                reminder.reminderText;
+
+            resultSection.hidden = false;
+            saveButton.textContent = "Save Reminder";
+
+            resultSection.scrollIntoView({
+                behavior: "smooth"
+            });
+        });
+
+        const copyHistoryButton =
+            document.createElement("button");
+
+        copyHistoryButton.type = "button";
+        copyHistoryButton.textContent = "Copy";
+
+        copyHistoryButton.addEventListener(
+            "click",
+            async function () {
+                if (!reminder.reminderText) {
+                    alert(
+                        "This older saved reminder does not contain a message."
+                    );
+                    return;
+                }
+
+                try {
+                    await navigator.clipboard.writeText(
+                        reminder.reminderText
+                    );
+
+                    copyHistoryButton.textContent =
+                        "Copied!";
+
+                    setTimeout(function () {
+                        copyHistoryButton.textContent =
+                            "Copy";
+                    }, 2000);
+                } catch {
+                    copyHistoryButton.textContent =
+                        "Copy failed";
+                }
+            }
+        );
+
+        const deleteButton =
+            document.createElement("button");
+
+        deleteButton.type = "button";
+        deleteButton.textContent = "Delete";
+        deleteButton.className =
+            "delete-history-button";
+
+        deleteButton.addEventListener(
+            "click",
+            function () {
+                const confirmed = window.confirm(
+                    `Delete the saved reminder for ${reminder.customerName}?`
+                );
+
+                if (!confirmed) {
+                    return;
+                }
+
+                const updatedReminders =
+                    getSavedReminders();
+
+                updatedReminders.splice(index, 1);
+                storeSavedReminders(updatedReminders);
+                renderHistory();
+            }
+        );
+
+        actions.appendChild(openButton);
+        actions.appendChild(copyHistoryButton);
+        actions.appendChild(deleteButton);
+
         item.appendChild(title);
         item.appendChild(amount);
         item.appendChild(status);
         item.appendChild(savedDate);
+        item.appendChild(actions);
 
         historyList.appendChild(item);
     });
@@ -241,6 +342,7 @@ form.addEventListener("submit", function (event) {
     currentReminder = {
         invoiceNumber,
         customerName,
+        customerEmail,
         formattedAmount,
         overdueStatus,
         reminderText,
@@ -297,8 +399,14 @@ emailButton.addEventListener(
     function () {
         const editedReminder = getEditedReminder();
 
+        if (!emailRecipient) {
+            alert(
+                "This reminder does not have a customer email address. Generate a new reminder with an email address."
+            );
+            return;
+        }
+
         if (
-            !emailRecipient ||
             !editedReminder.subject ||
             !editedReminder.body
         ) {

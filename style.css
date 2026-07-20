@@ -272,4 +272,34 @@ button:hover {
     #clearHistoryButton {
         width: 100%;
     }
+}.history-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.history-actions button {
+    width: auto;
+    margin: 0;
+    padding: 9px 14px;
+    font-size: 14px;
+}
+
+.history-actions .delete-history-button {
+    background: #dc2626;
+}
+
+.history-actions .delete-history-button:hover {
+    background: #b91c1c;
+}
+
+@media (max-width: 600px) {
+    .history-actions {
+        flex-direction: column;
+    }
+
+    .history-actions button {
+        width: 100%;
+    }
 }
