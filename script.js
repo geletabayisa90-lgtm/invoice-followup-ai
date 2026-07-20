@@ -4,17 +4,19 @@ const reminderOutput = document.getElementById("reminderOutput");
 const copyButton = document.getElementById("copyButton");
 const emailButton = document.getElementById("emailButton");
 const saveButton = document.getElementById("saveButton");
+
 const clearHistoryButton = document.getElementById(
     "clearHistoryButton"
 );
+
 const emptyHistoryMessage = document.getElementById(
     "emptyHistoryMessage"
 );
+
 const historyList = document.getElementById("historyList");
 
 let emailRecipient = "";
 let emailSubject = "";
-let emailBody = "";
 let currentReminder = null;
 
 function getSavedReminders() {
@@ -34,6 +36,42 @@ function storeSavedReminders(reminders) {
         "invoiceReminderHistory",
         JSON.stringify(reminders)
     );
+}
+
+function getEditedReminder() {
+    const fullText = reminderOutput.value.trim();
+
+    if (!fullText) {
+        return {
+            fullText: "",
+            subject: emailSubject,
+            body: ""
+        };
+    }
+
+    const lines = fullText.split("\n");
+    const firstLine = lines[0].trim();
+
+    let subject = emailSubject;
+    let body = fullText;
+
+    if (firstLine.toLowerCase().startsWith("subject:")) {
+        const editedSubject = firstLine
+            .slice("subject:".length)
+            .trim();
+
+        if (editedSubject) {
+            subject = editedSubject;
+        }
+
+        body = lines.slice(1).join("\n").trim();
+    }
+
+    return {
+        fullText,
+        subject,
+        body
+    };
 }
 
 function renderHistory() {
@@ -108,12 +146,15 @@ form.addEventListener("submit", function (event) {
         .getElementById("tone")
         .value;
 
-    const dueDate = new Date(`${dueDateValue}T00:00:00`);
+    const dueDate = new Date(
+        `${dueDateValue}T00:00:00`
+    );
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const millisecondsPerDay = 1000 * 60 * 60 * 24;
+    const millisecondsPerDay =
+        1000 * 60 * 60 * 24;
 
     const daysOverdue = Math.floor(
         (today - dueDate) / millisecondsPerDay
@@ -130,25 +171,23 @@ form.addEventListener("submit", function (event) {
         daysOverdue === 0
             ? "Due today"
             : `${daysOverdue} ${
-                  daysOverdue === 1 ? "day" : "days"
+                  daysOverdue === 1
+                      ? "day"
+                      : "days"
               } overdue`;
 
-    const formattedDueDate = dueDate.toLocaleDateString(
-        "en-US",
-        {
+    const formattedDueDate =
+        dueDate.toLocaleDateString("en-US", {
             year: "numeric",
             month: "long",
             day: "numeric"
-        }
-    );
+        });
 
-    const formattedAmount = amount.toLocaleString(
-        "en-US",
-        {
+    const formattedAmount =
+        amount.toLocaleString("en-US", {
             style: "currency",
             currency: "USD"
-        }
-    );
+        });
 
     let subject = "";
     let message = "";
@@ -198,7 +237,6 @@ form.addEventListener("submit", function (event) {
 
     emailRecipient = customerEmail;
     emailSubject = subject;
-    emailBody = body;
 
     currentReminder = {
         invoiceNumber,
@@ -209,7 +247,7 @@ form.addEventListener("submit", function (event) {
         savedAt: new Date().toLocaleString("en-US")
     };
 
-    reminderOutput.textContent = reminderText;
+    reminderOutput.value = reminderText;
     resultSection.hidden = false;
     saveButton.textContent = "Save Reminder";
 
@@ -218,12 +256,27 @@ form.addEventListener("submit", function (event) {
     });
 });
 
+reminderOutput.addEventListener("input", function () {
+    if (currentReminder) {
+        saveButton.textContent = "Save Reminder";
+    }
+});
+
 copyButton.addEventListener(
     "click",
     async function () {
+        const editedReminder = getEditedReminder();
+
+        if (!editedReminder.fullText) {
+            alert(
+                "Please generate a reminder first."
+            );
+            return;
+        }
+
         try {
             await navigator.clipboard.writeText(
-                reminderOutput.textContent
+                editedReminder.fullText
             );
 
             copyButton.textContent = "Copied!";
@@ -242,10 +295,12 @@ copyButton.addEventListener(
 emailButton.addEventListener(
     "click",
     function () {
+        const editedReminder = getEditedReminder();
+
         if (
             !emailRecipient ||
-            !emailSubject ||
-            !emailBody
+            !editedReminder.subject ||
+            !editedReminder.body
         ) {
             alert(
                 "Please generate a reminder first."
@@ -255,8 +310,12 @@ emailButton.addEventListener(
 
         const emailLink =
             `mailto:${encodeURIComponent(emailRecipient)}` +
-            `?subject=${encodeURIComponent(emailSubject)}` +
-            `&body=${encodeURIComponent(emailBody)}`;
+            `?subject=${encodeURIComponent(
+                editedReminder.subject
+            )}` +
+            `&body=${encodeURIComponent(
+                editedReminder.body
+            )}`;
 
         window.location.href = emailLink;
     }
@@ -272,13 +331,30 @@ saveButton.addEventListener(
             return;
         }
 
+        const editedReminder = getEditedReminder();
+
+        if (!editedReminder.fullText) {
+            alert(
+                "The reminder cannot be empty."
+            );
+            return;
+        }
+
+        const reminderToSave = {
+            ...currentReminder,
+            reminderText: editedReminder.fullText,
+            savedAt: new Date().toLocaleString("en-US")
+        };
+
         const reminders = getSavedReminders();
 
-        reminders.unshift(currentReminder);
+        reminders.unshift(reminderToSave);
 
         storeSavedReminders(
             reminders.slice(0, 25)
         );
+
+        currentReminder = reminderToSave;
 
         renderHistory();
         saveButton.textContent = "Saved!";

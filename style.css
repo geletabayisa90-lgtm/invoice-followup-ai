@@ -40,15 +40,21 @@ label {
     font-weight: bold;
 }
 
-input {
+input,
+select {
     width: 100%;
     padding: 12px;
     border: 1px solid #d1d5db;
     border-radius: 8px;
+    background: white;
+    color: #1f2937;
+    font-family: Arial, sans-serif;
     font-size: 16px;
 }
 
-input:focus {
+input:focus,
+select:focus,
+#reminderOutput:focus {
     border-color: #2563eb;
     outline: 3px solid rgba(37, 99, 235, 0.15);
 }
@@ -71,38 +77,35 @@ button:hover {
 
 #resultSection {
     margin-top: 28px;
-    padding: 20px;
-    border-radius: 10px;
+    padding: 24px;
+    border-radius: 12px;
     background: #eff6ff;
 }
 
-#reminderOutput {
-    line-height: 1.6;
-    white-space: pre-wrap;
+#resultSection h2 {
+    margin-top: 0;
 }
 
-@media (max-width: 600px) {
-    body {
-        padding: 20px 12px;
-    }
-
-    .container {
-        padding: 22px;
-    }
-}select {
+#reminderOutput {
+    display: block;
     width: 100%;
-    padding: 12px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
+    min-height: 360px;
+    padding: 16px;
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
     background: white;
     color: #1f2937;
+    font-family: Arial, sans-serif;
     font-size: 16px;
+    line-height: 1.6;
+    resize: vertical;
 }
 
-select:focus {
-    border-color: #2563eb;
-    outline: 3px solid rgba(37, 99, 235, 0.15);
-}.feedback-section {
+#resultSection button {
+    margin-right: 8px;
+}
+
+.feedback-section {
     margin-top: 30px;
     padding-top: 24px;
     border-top: 1px solid #d1d5db;
@@ -127,7 +130,9 @@ select:focus {
 .feedback-button:hover {
     background: #2563eb;
     color: white;
-}.history-section {
+}
+
+.history-section {
     margin-top: 30px;
     padding-top: 24px;
     border-top: 1px solid #d1d5db;
@@ -175,7 +180,9 @@ select:focus {
 .history-item p {
     margin: 5px 0;
     color: #4b5563;
-}.how-it-works {
+}
+
+.how-it-works {
     margin: 30px 0;
     padding: 24px;
     border-radius: 12px;
@@ -232,7 +239,37 @@ select:focus {
 }
 
 @media (max-width: 600px) {
+    body {
+        padding: 20px 12px;
+    }
+
+    .container {
+        padding: 22px;
+    }
+
     .steps {
         grid-template-columns: 1fr;
+    }
+
+    #resultSection {
+        padding: 18px;
+    }
+
+    #reminderOutput {
+        min-height: 420px;
+    }
+
+    #resultSection button {
+        width: 100%;
+        margin-right: 0;
+    }
+
+    .history-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    #clearHistoryButton {
+        width: 100%;
     }
 }
