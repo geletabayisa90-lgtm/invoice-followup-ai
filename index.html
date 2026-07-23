@@ -3,56 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice Follow-Up AI</title>
+    <title>AI Accounts Receivable Assistant | Invoice Follow-Up AI</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <main class="container">
-        <h1>Invoice Follow-Up AI</h1>
-        <p>Create professional payment reminders in seconds.</p>
+        <h1>AI Accounts Receivable Assistant</h1>
+        <p>
+            Create clear, professional overdue-invoice follow-ups
+            without spending time writing every message yourself.
+        </p>
+
         <section class="how-it-works">
-            <h2>How It Works</h2>
-        
+            <h2>Turn Overdue Invoices Into Ready-to-Send Follow-Ups</h2>
+
             <div class="steps">
                 <article class="step">
                     <span>1</span>
-                    <h3>Enter Invoice Details</h3>
+                    <h3>Add the Invoice</h3>
                     <p>
-                        Add the customer, amount, due date,
-                        and optional payment link.
+                        Enter the customer, amount, due date,
+                        invoice number, and optional payment link.
                     </p>
                 </article>
-        
+
                 <article class="step">
                     <span>2</span>
-                    <h3>Choose a Tone</h3>
+                    <h3>Choose Your Approach</h3>
                     <p>
-                        Generate a friendly reminder,
-                        firm request, or final notice.
+                        Create a friendly reminder, firm request,
+                        or professional final notice.
                     </p>
                 </article>
-        
+
                 <article class="step">
                     <span>3</span>
                     <h3>Send or Save</h3>
                     <p>
-                        Copy the message, open it in Gmail,
-                        or save it in your browser.
+                        Review the message, open it in your email app,
+                        or save it for future reference.
                     </p>
                 </article>
             </div>
-        
+
             <p class="privacy-note">
-                Your invoice information stays in your browser
-                and is not uploaded to our servers.
+                This is a free early prototype. Your invoice information
+                stays in your browser and is not uploaded to our servers.
             </p>
         </section>
+
         <form id="reminderForm">
             <label for="businessName">Your business name</label>
             <input type="text" id="businessName" required>
 
             <label for="customerName">Customer name</label>
             <input type="text" id="customerName" required>
+
             <label for="customerEmail">Customer email</label>
             <input
                 type="email"
@@ -60,6 +66,7 @@
                 placeholder="customer@example.com"
                 required
             >
+
             <label for="invoiceNumber">Invoice number</label>
             <input type="text" id="invoiceNumber" required>
 
@@ -68,57 +75,87 @@
 
             <label for="dueDate">Due date</label>
             <input type="date" id="dueDate" required>
+
             <label for="paymentLink">Payment link (optional)</label>
             <input
                 type="url"
                 id="paymentLink"
                 placeholder="https://your-payment-link.com"
-            > 
-            <label for="tone">Reminder tone</label>
+            >
+
+            <label for="tone">Follow-up tone</label>
             <select id="tone" required>
                 <option value="friendly">Friendly reminder</option>
-                <option value="firm">Firm reminder</option>
+                <option value="firm">Firm payment request</option>
                 <option value="final">Final notice</option>
             </select>
-            <button type="submit">Generate Reminder</button>
+
+            <button type="submit">Create Payment Follow-Up</button>
         </form>
 
         <section id="resultSection" hidden>
-            <h2>Your payment reminder</h2>
+            <h2>Your Ready-to-Send Follow-Up</h2>
+
             <textarea
-    id="reminderOutput"
-    rows="14"
-    aria-label="Generated invoice reminder"
-    spellcheck="true"
-></textarea>
+                id="reminderOutput"
+                rows="14"
+                aria-label="Generated invoice reminder"
+                spellcheck="true"
+            ></textarea>
+
             <button type="button" id="copyButton">Copy Message</button>
-            <button type="button" id="emailButton">Send with Email App</button>
-            <button type="button" id="saveButton">Save Reminder</button>
+            <button type="button" id="emailButton">Open in Email App</button>
+            <button type="button" id="saveButton">Save Follow-Up</button>
+
             <div class="result-feedback" aria-labelledby="resultFeedbackQuestion">
-                <p id="resultFeedbackQuestion">Was this reminder useful?</p>
+                <p id="resultFeedbackQuestion">
+                    Would this save you time following up on unpaid invoices?
+                </p>
+
                 <div class="feedback-choices">
-                    <a href="https://forms.gle/PU1a9QduDTvGaTyG8" target="_blank" rel="noopener noreferrer">👍 Yes</a>
-                    <a href="https://forms.gle/PU1a9QduDTvGaTyG8" target="_blank" rel="noopener noreferrer">👎 No</a>
+                    <a
+                        href="https://forms.gle/PU1a9QduDTvGaTyG8"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >👍 Yes</a>
+
+                    <a
+                        href="https://forms.gle/PU1a9QduDTvGaTyG8"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >👎 No</a>
                 </div>
-                <a class="feedback-details-link" href="https://forms.gle/PU1a9QduDTvGaTyG8" target="_blank" rel="noopener noreferrer">Tell us why</a>
+
+                <a
+                    class="feedback-details-link"
+                    href="https://forms.gle/PU1a9QduDTvGaTyG8"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >Tell us why</a>
             </div>
         </section>
+
         <section id="historySection" class="history-section">
             <div class="history-heading">
-                <h2>Saved Reminders</h2>
+                <h2>Saved Follow-Ups</h2>
                 <button type="button" id="clearHistoryButton">
                     Clear History
                 </button>
             </div>
-        
+
             <p id="emptyHistoryMessage">
-                No reminders saved yet.
+                No follow-ups saved yet.
             </p>
-        
+
             <div id="historyList"></div>
         </section>
+
         <section class="feedback-section">
-            <p>Help us improve Invoice Follow-Up AI.</p>
+            <p>
+                Help us build a better accounts receivable assistant
+                for small businesses.
+            </p>
+
             <a
                 class="feedback-button"
                 href="https://docs.google.com/forms/d/e/1FAIpQLSciPIqaOZWNICEapartX4webXKOMAzbdnPBFlSGGddXzPRoZQ/viewform"
